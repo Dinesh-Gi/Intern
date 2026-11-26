@@ -1,3 +1,4 @@
+
 name: Deploy Backend to Windows App Service
 
 on:
@@ -7,7 +8,6 @@ on:
     paths:
       - 'backend/**'
       - '.github/workflows/deploy-intern-windows.yml'
-
   workflow_dispatch:
 
 env:
@@ -15,16 +15,13 @@ env:
   NODE_VERSION: '22.x'
 
 jobs:
-  build-and-deploy:
-    name: Build and Deploy Backend
+  build:
     runs-on: windows-latest
 
     steps:
-      # Checkout repository
       - name: Checkout source code
         uses: actions/checkout@v4
 
-      # Configure Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -32,45 +29,56 @@ jobs:
           cache: npm
           cache-dependency-path: backend/package-lock.json
 
-      # Install dependencies
       - name: Install dependencies
         working-directory: backend
         run: npm ci
 
-      # TypeScript validation
       - name: Check TypeScript
         working-directory: backend
         run: npm run check
 
-      # Run application tests
       - name: Run tests
         working-directory: backend
         run: npm test
 
-      # Compile TypeScript
       - name: Build application
         working-directory: backend
         run: npm run build
 
-      # Verify deployment files
       - name: Verify deployment files
         working-directory: backend
         shell: pwsh
         run: |
           if (!(Test-Path "dist/server.js")) {
-            throw "Build failed: dist/server.js not found"
+            throw "dist/server.js not found"
           }
 
           if (!(Test-Path "web.config")) {
-            throw "web.config not found in backend folder"
+            throw "web.config not found"
           }
 
-          Write-Host "Deployment files verified successfully."
+      - name: Upload deployment artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: intern-backend
+          path: backend/
+          include-hidden-files: true
+          if-no-files-found: error
 
-      # Deploy to Windows Azure App Service
-      - name: Deploy to Azure App Service
+  deploy:
+    runs-on: windows-latest
+    needs: build
+
+    steps:
+      - name: Download deployment artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: intern-backend
+          path: ./backend
+
+      - name: Deploy to Windows App Service
         uses: azure/webapps-deploy@v3
         with:
-          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          app-name: intern
           publish-profile: ${{ secrets.AZURE_BACKEND_WINDOWS_PUBLISH_PROFILE }}
-          package: backend
+          package: ./backend
