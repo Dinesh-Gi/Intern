@@ -4,8 +4,7 @@ import app from "./app.js";
 import { AppDataSource } from "./datasource.js";
 import { Session } from "./entity/TransactionsSession.js";
 
-
-const PORT = Number(process.env.PORT) || 5000;
+const PORT = process.env.PORT || 5000;
 
 AppDataSource.initialize()
     .then(async () => {
