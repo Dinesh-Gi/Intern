@@ -1,5 +1,5 @@
 
-name: Deploy Backend to Windows App Service
+name: Deploy Intern Backend to Windows App Service
 
 on:
   push:
@@ -8,24 +8,29 @@ on:
     paths:
       - 'backend/**'
       - '.github/workflows/deploy-intern-windows.yml'
+
   workflow_dispatch:
 
-env:
-  AZURE_WEBAPP_NAME: intern
-  NODE_VERSION: '22.x'
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: pwsh
 
 jobs:
-  build:
+  backend-check:
+    name: Check, build and package backend
     runs-on: windows-latest
 
     steps:
-      - name: Checkout source code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version: 22.x
           cache: npm
           cache-dependency-path: backend/package-lock.json
 
@@ -33,7 +38,12 @@ jobs:
         working-directory: backend
         run: npm ci
 
-      - name: Check TypeScript
+      - name: Verify SQLite driver
+        working-directory: backend
+        run: |
+          node -e "require('sqlite3'); console.log('SQLite driver loaded successfully')"
+
+      - name: Type check
         working-directory: backend
         run: npm run check
 
@@ -41,44 +51,105 @@ jobs:
         working-directory: backend
         run: npm test
 
-      - name: Build application
+      - name: Clean previous build
+        working-directory: backend
+        run: |
+          if (Test-Path 'dist') {
+            Remove-Item 'dist' -Recurse -Force
+          }
+
+      - name: Build backend
         working-directory: backend
         run: npm run build
 
-      - name: Verify deployment files
+      - name: Verify build output
         working-directory: backend
-        shell: pwsh
         run: |
-          if (!(Test-Path "dist/server.js")) {
-            throw "dist/server.js not found"
+          if (!(Test-Path 'dist/server.js')) {
+            throw 'dist/server.js not found'
           }
 
-          if (!(Test-Path "web.config")) {
-            throw "web.config not found"
+      - name: Create deployment package
+        run: |
+          $deployDir = Join-Path $env:RUNNER_TEMP 'intern-deploy'
+
+          if (Test-Path $deployDir) {
+            Remove-Item $deployDir -Recurse -Force
           }
 
-      - name: Upload deployment artifact
+          New-Item -ItemType Directory -Path $deployDir | Out-Null
+
+          Copy-Item 'backend/dist/*' $deployDir -Recurse -Force
+          Copy-Item 'backend/package.json' $deployDir
+          Copy-Item 'backend/package-lock.json' $deployDir
+
+          $packagePath = Join-Path $deployDir 'package.json'
+          $packageJson = Get-Content $packagePath -Raw | ConvertFrom-Json
+
+          $packageJson.main = 'server.js'
+          $packageJson.scripts.start = 'node server.js'
+
+          $packageJson | ConvertTo-Json -Depth 100 |
+            Set-Content $packagePath -Encoding utf8
+
+          @'
+          <?xml version="1.0" encoding="utf-8"?>
+          <configuration>
+            <system.webServer>
+              <handlers>
+                <add name="iisnode" path="server.js" verb="*" modules="iisnode" />
+              </handlers>
+              <rewrite>
+                <rules>
+                  <rule name="DynamicContent">
+                    <conditions>
+                      <add input="{REQUEST_FILENAME}" matchType="IsFile" negate="True" />
+                    </conditions>
+                    <action type="Rewrite" url="server.js" />
+                  </rule>
+                </rules>
+              </rewrite>
+              <iisnode watchedFiles="web.config;*.js" />
+            </system.webServer>
+          </configuration>
+          '@ | Set-Content (Join-Path $deployDir 'web.config') -Encoding utf8
+
+          $zipPath = Join-Path $env:GITHUB_WORKSPACE 'intern-deploy.zip'
+
+          Compress-Archive -Path "$deployDir/*" `
+            -DestinationPath $zipPath -CompressionLevel Optimal
+
+      - name: Upload deployment package
         uses: actions/upload-artifact@v4
         with:
-          name: intern-backend
-          path: backend/
-          include-hidden-files: true
+          name: intern-deployment-package
+          path: intern-deploy.zip
           if-no-files-found: error
+          retention-days: 1
 
-  deploy:
+  deploy-backend:
+    name: Deploy to Intern Windows App Service
     runs-on: windows-latest
-    needs: build
+    needs: backend-check
 
     steps:
-      - name: Download deployment artifact
+      - name: Download deployment package
         uses: actions/download-artifact@v4
         with:
-          name: intern-backend
-          path: ./backend
+          name: intern-deployment-package
+          path: .
 
-      - name: Deploy to Windows App Service
+      - name: Verify publish profile
+        env:
+          AZURE_PROFILE: ${{ secrets.AZURE_BACKEND_WINDOWS_PUBLISH_PROFILE }}
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:AZURE_PROFILE)) {
+            throw 'Windows App Service publish profile secret is missing'
+          }
+
+      - name: Deploy to Azure
         uses: azure/webapps-deploy@v3
         with:
           app-name: intern
           publish-profile: ${{ secrets.AZURE_BACKEND_WINDOWS_PUBLISH_PROFILE }}
-          package: ./backend
+          package: intern-deploy.zip
