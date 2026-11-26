@@ -1,65 +1,76 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
-name: Build and deploy Node.js app to Azure Web App - intern
+name: Deploy Backend to Windows App Service
 
 on:
   push:
     branches:
-      - 'main'
+      - main
+    paths:
+      - 'backend/**'
+      - '.github/workflows/deploy-intern-windows.yml'
+
   workflow_dispatch:
 
+env:
+  AZURE_WEBAPP_NAME: intern
+  NODE_VERSION: '22.x'
+
 jobs:
-  build:
+  build-and-deploy:
+    name: Build and Deploy Backend
     runs-on: windows-latest
-    permissions:
-      contents: read #This is required for actions/checkout
 
     steps:
-      - uses: actions/checkout@v4
+      # Checkout repository
+      - name: Checkout source code
+        uses: actions/checkout@v4
 
-      - name: Set up Node.js version
-        uses: actions/setup-node@v3
+      # Configure Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: '22.x'
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
 
-      - name: npm install, build, and test
+      # Install dependencies
+      - name: Install dependencies
+        working-directory: backend
+        run: npm ci
+
+      # TypeScript validation
+      - name: Check TypeScript
+        working-directory: backend
+        run: npm run check
+
+      # Run application tests
+      - name: Run tests
+        working-directory: backend
+        run: npm test
+
+      # Compile TypeScript
+      - name: Build application
+        working-directory: backend
+        run: npm run build
+
+      # Verify deployment files
+      - name: Verify deployment files
+        working-directory: backend
+        shell: pwsh
         run: |
-          npm install
-          npm run build --if-present
-          npm run test --if-present
-      
-      - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v4
-        with:
-          name: node-app
-          path: .
+          if (!(Test-Path "dist/server.js")) {
+            throw "Build failed: dist/server.js not found"
+          }
 
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    permissions:
-      id-token: write #This is required for requesting the JWT
-      contents: read #This is required for actions/checkout
+          if (!(Test-Path "web.config")) {
+            throw "web.config not found in backend folder"
+          }
 
-    steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v4
-        with:
-          name: node-app
-      
-      - name: Login to Azure
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_F7532C0472EF401CBEDB03FD3193FBDC }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_B44D6E9E71834A759B7105ED0EE382AB }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_4331045550484539AD4CAEF71D41EDF5 }}
+          Write-Host "Deployment files verified successfully."
 
-      - name: 'Deploy to Azure Web App'
+      # Deploy to Windows Azure App Service
+      - name: Deploy to Azure App Service
         uses: azure/webapps-deploy@v3
-        id: deploy-to-webapp
         with:
-          app-name: 'intern'
-          slot-name: 'Production'
-          package: .
-          
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_BACKEND_WINDOWS_PUBLISH_PROFILE }}
+          package: backend
