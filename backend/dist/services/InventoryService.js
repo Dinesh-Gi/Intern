@@ -1,0 +1,464 @@
+import { AppDataSource } from "../datasource.js";
+import { Inventory } from "../entity/TransactionsInventory.js";
+import { StockMovement } from "../entity/TransactionsStockMovement.js";
+import { ReferenceType } from "../entity/MasterReference.js";
+import { MovementType } from "../entity/MasterMovementType.js";
+import { createAuditRecordService } from "./AuditServices.js";
+import { DamagedGoods } from "../entity/TransactionsDamagedGoods.js";
+const inventoryRepository = AppDataSource.getRepository(Inventory);
+const getReferenceType = async (manager, code) => {
+    const referenceType = await manager.findOne(ReferenceType, {
+        where: {
+            code,
+            is_active: true
+        }
+    });
+    if (!referenceType) {
+        throw new Error(`Reference type with code '${code}' not found or inactive`);
+    }
+    return referenceType;
+};
+const getMovementType = async (manager, code) => {
+    const movementType = await manager.findOne(MovementType, {
+        where: {
+            code,
+            is_active: true
+        }
+    });
+    if (!movementType) {
+        throw new Error(`Movement type with code '${code}' not found or inactive`);
+    }
+    return movementType;
+};
+const resolveMovementType = async (manager, movementTypeId) => {
+    if (movementTypeId !== undefined &&
+        Number.isInteger(movementTypeId) &&
+        movementTypeId > 0) {
+        const movementType = await manager.findOne(MovementType, {
+            where: {
+                movement_type_id: movementTypeId,
+                is_active: true
+            }
+        });
+        if (!movementType) {
+            throw new Error("Valid movement type ID is required");
+        }
+        return movementType;
+    }
+    return getMovementType(manager, "STOCK");
+};
+export const createInventoryService = async (inventoryData, callerStoreId) => {
+    const storeId = inventoryData.store_id;
+    const productId = inventoryData.product_id;
+    const quantity = inventoryData.qty ?? 0;
+    const userId = inventoryData.created_by;
+    const sessionId = inventoryData.session_id ?? 1;
+    if (storeId === undefined ||
+        !Number.isInteger(storeId) ||
+        storeId <= 0) {
+        throw new Error("Valid store ID is required");
+    }
+    if (storeId !== callerStoreId) {
+        throw new Error("STORE_MISMATCH");
+    }
+    if (productId === undefined ||
+        !Number.isInteger(productId) ||
+        productId <= 0) {
+        throw new Error("Valid product ID is required");
+    }
+    if (!Number.isInteger(quantity) ||
+        quantity < 0) {
+        throw new Error("Quantity must be a non-negative integer");
+    }
+    const queryRunner = AppDataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+        const inventoryRepo = queryRunner.manager.getRepository(Inventory);
+        const stockMovementRepo = queryRunner.manager.getRepository(StockMovement);
+        let inventory = await inventoryRepo.findOne({
+            where: {
+                store_id: storeId,
+                product_id: productId
+            }
+        });
+        const now = new Date();
+        if (!inventory) {
+            const referenceType = await getReferenceType(queryRunner.manager, "INVADD");
+            inventory = inventoryRepo.create({
+                ...inventoryData,
+                store_id: storeId,
+                product_id: productId,
+                qty: quantity,
+                is_active: true,
+                created_at: now,
+                created_by: userId ?? null,
+                updated_at: now,
+                updated_by: userId ?? null
+            });
+            inventory = await inventoryRepo.save(inventory);
+            await createAuditRecordService(queryRunner.manager, {
+                tableName: "transactions_inventory",
+                recordId: inventory.inventory_id,
+                actionTypeName: "INSERT",
+                userId: userId ?? 1,
+                storeId: storeId,
+                sessionId: sessionId
+            });
+            if (quantity > 0) {
+                const movementType = await resolveMovementType(queryRunner.manager, inventoryData.movement_type_id);
+                const stockMovement = stockMovementRepo.create({
+                    inventory_id: inventory.inventory_id,
+                    movement_type_id: movementType.movement_type_id,
+                    reference_type_id: referenceType.reference_type_id,
+                    referenceType: referenceType,
+                    quantity_change: quantity,
+                    reference_id: inventoryData.reference_id ??
+                        inventory.inventory_id,
+                    is_active: true,
+                    created_at: now,
+                    created_by: userId ?? null,
+                    updated_at: null,
+                    updated_by: null
+                });
+                const savedMovement = await stockMovementRepo.save(stockMovement);
+                await createAuditRecordService(queryRunner.manager, {
+                    tableName: "transactions_stock_movement",
+                    recordId: savedMovement.movement_id,
+                    actionTypeName: "INSERT",
+                    userId: userId ?? 1,
+                    storeId: storeId,
+                    sessionId: sessionId
+                });
+            }
+        }
+        else {
+            if (quantity > 0) {
+                const referenceType = await getReferenceType(queryRunner.manager, "INVADD");
+                const movementType = await resolveMovementType(queryRunner.manager, inventoryData.movement_type_id);
+                inventory.qty += quantity;
+                inventory.is_active = true;
+                inventory.updated_at = null;
+                inventory.updated_by = null;
+                inventory =
+                    await inventoryRepo.save(inventory);
+                await createAuditRecordService(queryRunner.manager, {
+                    tableName: "transactions_inventory",
+                    recordId: inventory.inventory_id,
+                    actionTypeName: "UPDATE",
+                    userId: userId ?? 1,
+                    storeId: storeId,
+                    sessionId: sessionId
+                });
+                const stockMovement = stockMovementRepo.create({
+                    inventory_id: inventory.inventory_id,
+                    movement_type_id: movementType.movement_type_id,
+                    reference_type_id: referenceType.reference_type_id,
+                    referenceType: referenceType,
+                    quantity_change: quantity,
+                    reference_id: inventoryData.reference_id ??
+                        inventory.inventory_id,
+                    is_active: true,
+                    created_at: now,
+                    created_by: userId ?? null,
+                    updated_at: null,
+                    updated_by: null
+                });
+                const savedMovement = await stockMovementRepo.save(stockMovement);
+                await createAuditRecordService(queryRunner.manager, {
+                    tableName: "transactions_stock_movement",
+                    recordId: savedMovement.movement_id,
+                    actionTypeName: "INSERT",
+                    userId: userId ?? 1,
+                    storeId: storeId,
+                    sessionId: sessionId
+                });
+            }
+            else if (!inventory.is_active) {
+                inventory.is_active = true;
+                inventory.updated_at = now;
+                inventory.updated_by = userId ?? null;
+                inventory =
+                    await inventoryRepo.save(inventory);
+                await createAuditRecordService(queryRunner.manager, {
+                    tableName: "transactions_inventory",
+                    recordId: inventory.inventory_id,
+                    actionTypeName: "UPDATE",
+                    userId: userId ?? 1,
+                    storeId: storeId,
+                    sessionId: sessionId
+                });
+            }
+        }
+        await queryRunner.commitTransaction();
+        return inventory;
+    }
+    catch (error) {
+        await queryRunner.rollbackTransaction();
+        throw error;
+    }
+    finally {
+        await queryRunner.release();
+    }
+};
+export const getInventoryByStoreService = async (storeId, productId, productName) => {
+    const query = inventoryRepository
+        .createQueryBuilder("inventory")
+        .leftJoinAndSelect("inventory.product", "product")
+        .leftJoinAndSelect("product.type", "type")
+        .leftJoinAndSelect("product.brand", "brand")
+        .leftJoinAndSelect("product.uom", "uom")
+        .leftJoinAndSelect("inventory.store", "store")
+        .where("inventory.store_id = :storeId", { storeId })
+        .andWhere("inventory.is_active = :isActive", { isActive: true });
+    if (productId !== undefined) {
+        query.andWhere("inventory.product_id = :productId", { productId });
+    }
+    if (productName !== undefined &&
+        productName.trim() !== "") {
+        query.andWhere("LOWER(product.product_name) LIKE LOWER(:productName)", {
+            productName: `%${productName.trim()}%`
+        });
+    }
+    return await query
+        .orderBy("inventory.inventory_id", "ASC")
+        .getMany();
+};
+export const getInventoryByIdService = async (inventoryId) => {
+    return await inventoryRepository.findOne({
+        where: {
+            inventory_id: inventoryId,
+            is_active: true
+        },
+        relations: [
+            "product",
+            "product.type",
+            "product.brand",
+            "product.uom",
+            "store"
+        ]
+    });
+};
+export const updatePricingService = async (inventoryId, costPrice, sellingPrice, userId, callerStoreId, sessionId, ipAddress) => {
+    const inventory = await inventoryRepository.findOne({
+        where: {
+            inventory_id: inventoryId,
+            is_active: true
+        }
+    });
+    if (!inventory) {
+        return null;
+    }
+    if (inventory.store_id !== callerStoreId) {
+        throw new Error("STORE_MISMATCH");
+    }
+    if (costPrice !== null &&
+        (!Number.isFinite(costPrice) ||
+            costPrice < 0)) {
+        throw new Error("Invalid cost price");
+    }
+    if (!Number.isFinite(sellingPrice) ||
+        sellingPrice < 0) {
+        throw new Error("Invalid selling price");
+    }
+    inventory.cost_price = costPrice;
+    inventory.selling_price = sellingPrice;
+    inventory.updated_by = userId;
+    inventory.updated_at = new Date();
+    const updatedInventory = await inventoryRepository.save(inventory);
+    await createAuditRecordService(AppDataSource.manager, {
+        tableName: "transactions_inventory",
+        recordId: updatedInventory.inventory_id,
+        actionTypeName: "UPDATE",
+        userId: userId,
+        storeId: updatedInventory.store_id,
+        sessionId: sessionId,
+        ipAddress: ipAddress ?? null
+    });
+    return await inventoryRepository.save(inventory);
+};
+export const updateInventoryQuantityService = async (inventoryId, quantityChange, movementTypeId, referenceTypeCode = "ADJ", referenceId, userId, callerStoreId, sessionId) => {
+    if (!Number.isInteger(quantityChange) ||
+        quantityChange === 0) {
+        throw new Error("Quantity change must be a non-zero integer");
+    }
+    if (!Number.isInteger(movementTypeId) ||
+        movementTypeId <= 0) {
+        throw new Error("Valid movement type ID is required");
+    }
+    const queryRunner = AppDataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+        const inventoryRepo = queryRunner.manager.getRepository(Inventory);
+        const stockMovementRepo = queryRunner.manager.getRepository(StockMovement);
+        const referenceType = await getReferenceType(queryRunner.manager, referenceTypeCode);
+        const inventory = await inventoryRepo.findOne({
+            where: {
+                inventory_id: inventoryId,
+                is_active: true
+            }
+        });
+        if (!inventory) {
+            throw new Error("Inventory not found");
+        }
+        if (inventory.store_id !== callerStoreId) {
+            throw new Error("STORE_MISMATCH");
+        }
+        const newQuantity = inventory.qty + quantityChange;
+        if (newQuantity < 0) {
+            throw new Error("Insufficient stock");
+        }
+        const now = new Date();
+        inventory.qty = newQuantity;
+        inventory.updated_by = userId;
+        inventory.updated_at = now;
+        const updatedInventory = await inventoryRepo.save(inventory);
+        await createAuditRecordService(queryRunner.manager, {
+            tableName: "transactions_inventory",
+            recordId: updatedInventory.inventory_id,
+            actionTypeName: "UPDATE",
+            userId: userId,
+            storeId: updatedInventory.store_id,
+            sessionId: sessionId
+        });
+        const stockMovement = stockMovementRepo.create({
+            inventory_id: inventoryId,
+            movement_type_id: movementTypeId,
+            reference_type_id: referenceType.reference_type_id,
+            referenceType: referenceType,
+            reference_id: referenceId ?? inventoryId,
+            quantity_change: quantityChange,
+            is_active: true,
+            created_at: now,
+            created_by: userId,
+            updated_at: now,
+            updated_by: userId
+        });
+        const stock = await stockMovementRepo.save(stockMovement);
+        await createAuditRecordService(queryRunner.manager, {
+            tableName: "transactions_stock_movement",
+            recordId: stock.movement_id,
+            actionTypeName: "INSERT",
+            userId: userId,
+            storeId: updatedInventory.store_id,
+            sessionId: sessionId
+        });
+        await queryRunner.commitTransaction();
+        return updatedInventory;
+    }
+    catch (error) {
+        await queryRunner.rollbackTransaction();
+        throw error;
+    }
+    finally {
+        await queryRunner.release();
+    }
+};
+export const deactivateInventoryService = async (inventoryId, userId, callerStoreId, sessionId) => {
+    const queryRunner = AppDataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+        const inventoryRepo = queryRunner.manager.getRepository(Inventory);
+        const damageRepo = queryRunner.manager.getRepository(DamagedGoods);
+        const inventory = await inventoryRepo.findOne({
+            where: {
+                inventory_id: inventoryId,
+                is_active: true
+            }
+        });
+        if (!inventory) {
+            return null;
+        }
+        if (inventory.store_id !== callerStoreId) {
+            throw new Error("STORE_MISMATCH");
+        }
+        if (inventory.qty > 0) {
+            throw new Error("Cannot delete inventory with available stock");
+        }
+        const now = new Date();
+        // ==============================================
+        // CASCADE: DEACTIVATE LINKED DAMAGED GOODS
+        // ==============================================
+        const activeDamagedGoods = await damageRepo.find({
+            where: {
+                inventory_id: inventoryId,
+                is_active: true
+            }
+        });
+        for (const damage of activeDamagedGoods) {
+            damage.is_active = false;
+            damage.updated_at = now;
+            damage.updated_by = userId;
+            await damageRepo.save(damage);
+            await createAuditRecordService(queryRunner.manager, {
+                tableName: "transactions_damaged_goods",
+                recordId: damage.damage_id,
+                actionTypeName: "DELETE",
+                userId,
+                storeId: inventory.store_id,
+                sessionId
+            });
+        }
+        // ==============================================
+        // DEACTIVATE INVENTORY
+        // ==============================================
+        inventory.is_active = false;
+        inventory.updated_by = userId;
+        inventory.updated_at = now;
+        const updatedInventory = await inventoryRepo.save(inventory);
+        await createAuditRecordService(queryRunner.manager, {
+            tableName: "transactions_inventory",
+            recordId: updatedInventory.inventory_id,
+            actionTypeName: "DELETE",
+            userId,
+            storeId: updatedInventory.store_id,
+            sessionId
+        });
+        // ==============================================
+        // STOCK MOVEMENT: INVENTORY DELETED
+        // ==============================================
+        const movementType = await getMovementType(queryRunner.manager, "DELETE");
+        const referenceType = await getReferenceType(queryRunner.manager, "INVDEL");
+        // const stockMovementRepo =
+        //     queryRunner.manager.getRepository(StockMovement);
+        // const stockMovement =
+        //     stockMovementRepo.create({
+        //         inventory_id: updatedInventory.inventory_id,
+        //         movement_type_id: movementType.movement_type_id,
+        //         reference_type_id: referenceType.reference_type_id,
+        //         referenceType,
+        //         quantity_change: 0,
+        //         reference_id: updatedInventory.inventory_id,
+        //         is_active: true,
+        //         created_at: now,
+        //         created_by: userId,
+        //         updated_at: now,
+        //         updated_by: userId
+        //     });
+        // const savedMovement =
+        //     await stockMovementRepo.save(stockMovement);
+        // await createAuditRecordService(
+        //     queryRunner.manager,
+        //     {
+        //         tableName: "transactions_stock_movement",
+        //         recordId: savedMovement.movement_id,
+        //         actionTypeName: "INSERT",
+        //         userId,
+        //         storeId: updatedInventory.store_id,
+        //         sessionId
+        //     }
+        // );
+        await queryRunner.commitTransaction();
+        return updatedInventory;
+    }
+    catch (error) {
+        await queryRunner.rollbackTransaction();
+        throw error;
+    }
+    finally {
+        await queryRunner.release();
+    }
+};
+//# sourceMappingURL=InventoryService.js.map

@@ -1,0 +1,165 @@
+import { createProductService, getAllProductsService, getProductByIdService, updateProductService, deleteProductService } from "../services/ProductService.js";
+// CREATE PRODUCT
+export async function createProductController(req, res) {
+    try {
+        const clientIp = req.headers["x-forwarded-for"]?.split(",")[0]?.trim() ||
+            req.socket.remoteAddress ||
+            null;
+        const product = await createProductService(req.body, req.auth.userId, req.auth.sessionId, clientIp, req.auth.storeId);
+        return res.status(201).json({
+            message: "Product created successfully",
+            data: product
+        });
+    }
+    catch (error) {
+        console.error(error);
+        if (error instanceof Error && error.message === "STORE_MISMATCH") {
+            return res.status(403).json({
+                message: "You cannot create a product for another store."
+            });
+        }
+        return res.status(400).json({
+            message: error instanceof Error ? error.message : "Failed to create product"
+        });
+    }
+}
+// GET ALL PRODUCTS
+// SEARCH PRODUCT BY NAME
+// FILTER PRODUCT BY STORE
+export const getAllProductsController = async (req, res) => {
+    try {
+        const storeId = req.query.storeId !== undefined
+            ? Number(req.query.storeId)
+            : undefined;
+        const productName = req.query.productName !== undefined
+            ? String(req.query.productName)
+            : undefined;
+        // VALIDATE STORE ID
+        if (storeId !== undefined &&
+            (!Number.isInteger(storeId) ||
+                storeId <= 0)) {
+            return res.status(400).json({
+                message: "Invalid store ID"
+            });
+        }
+        const products = await getAllProductsService(storeId, productName);
+        return res.status(200).json({
+            message: "Products fetched successfully",
+            data: products
+        });
+    }
+    catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            message: "Failed to fetch products"
+        });
+    }
+};
+// GET PRODUCT BY ID
+export const getProductByIdController = async (req, res) => {
+    try {
+        const productId = Number(req.params.id);
+        // VALIDATE PRODUCT ID
+        if (!Number.isInteger(productId) ||
+            productId <= 0) {
+            return res.status(400).json({
+                message: "Invalid product ID"
+            });
+        }
+        const product = await getProductByIdService(productId, req.auth.storeId);
+        if (!product) {
+            return res.status(404).json({
+                message: "Product not found"
+            });
+        }
+        return res.status(200).json({
+            message: "Product fetched successfully",
+            data: product
+        });
+    }
+    catch (error) {
+        console.error(error);
+        if (error instanceof Error && error.message === "STORE_MISMATCH") {
+            return res.status(403).json({
+                message: "You cannot access a product from another store."
+            });
+        }
+        return res.status(500).json({
+            message: "Failed to fetch product"
+        });
+    }
+};
+// UPDATE PRODUCT
+export const updateProductController = async (req, res) => {
+    try {
+        const productId = Number(req.params.id);
+        // VALIDATE PRODUCT ID
+        if (!Number.isInteger(productId) ||
+            productId <= 0) {
+            return res.status(400).json({
+                message: "Invalid product ID"
+            });
+        }
+        const clientIp = req.headers["x-forwarded-for"]?.split(",")[0]?.trim() ||
+            req.socket.remoteAddress ||
+            null;
+        const product = await updateProductService(productId, req.body, req.auth.userId, req.auth.sessionId, clientIp, req.auth.storeId);
+        if (!product) {
+            return res.status(404).json({
+                message: "Product not found"
+            });
+        }
+        return res.status(200).json({
+            message: "Product updated successfully",
+            data: product
+        });
+    }
+    catch (error) {
+        console.error(error);
+        if (error instanceof Error && error.message === "STORE_MISMATCH") {
+            return res.status(403).json({
+                message: "You cannot update a product from another store."
+            });
+        }
+        return res.status(400).json({
+            message: error instanceof Error ? error.message : "Failed to update product"
+        });
+    }
+};
+// DELETE / DEACTIVATE PRODUCT
+export const deleteProductController = async (req, res) => {
+    try {
+        const productId = Number(req.params.id);
+        // VALIDATE PRODUCT ID
+        if (!Number.isInteger(productId) ||
+            productId <= 0) {
+            return res.status(400).json({
+                message: "Invalid product ID"
+            });
+        }
+        const clientIp = req.headers["x-forwarded-for"]?.split(",")[0]?.trim() ||
+            req.socket.remoteAddress ||
+            null;
+        const product = await deleteProductService(productId, req.auth.userId, req.auth.sessionId, clientIp, req.auth.storeId);
+        if (!product) {
+            return res.status(404).json({
+                message: "Product not found"
+            });
+        }
+        return res.status(200).json({
+            message: "Product deleted successfully"
+        });
+    }
+    catch (error) {
+        console.error(error);
+        if (error instanceof Error && error.message === "STORE_MISMATCH") {
+            return res.status(403).json({
+                message: "You cannot delete a product from another store."
+            });
+        }
+        return res.status(400).json({
+            message: error instanceof Error ? error.message : "Failed to delete product"
+        });
+    }
+};
+//# sourceMappingURL=ProductController.js.map

@@ -1,0 +1,69 @@
+import "reflect-metadata";
+import express from "express";
+import cors from "cors";
+import authRoutes from "./routes/AuthRoute.js";
+import rolesRoutes from "./routes/RolesRoutes.js";
+import productRoutes from "./routes/Productroutes.js";
+import inventoryRoutes from "./routes/InventoryRoutes.js";
+import userRoutes from "./routes/UserRoutes.js";
+import storeRoutes from "./routes/StoreRoute.js";
+import customerRoutes from "./routes/CustomerRoute.js";
+import billRoutes from "./routes/BillRoute.js";
+import auditRoutes from "./routes/AuditRoute.js";
+import discountRoutes from "./routes/DiscountsRoute.js";
+import stockMovementRoutes from "./routes/StockMovement.Routes.js";
+import ProductTypeRouter from "./routes/ProductTypeRoutes.js";
+import ProductBrandRouter from "./routes/ProductBrandRoutes.js";
+import UnitRouter from "./routes/UomRoute.js";
+import damageGoodsRoutes from "./routes/DamageGood.routes.js";
+import { authenticate } from "./middleware/Authenticate.js";
+import { authorize } from "./middleware/Authorize.js";
+import { deactivateProductBrandController } from "./controller/ProductBrandController.js";
+import { deactivateProductTypeController } from "./controller/ProductTypeController.js";
+const app = express();
+app.get("/", (_req, res) => {
+    res.status(200).json({
+        success: true,
+        message: "BillAPP API is running."
+    });
+});
+const allowedOrigins = process.env.FRONTEND_URL
+    ? process.env.FRONTEND_URL.split(",").map((origin) => origin.trim())
+    : true;
+app.use(cors({ origin: allowedOrigins }));
+app.use(express.json());
+// API Routes
+app.use("/auth", authRoutes);
+app.use("/users", userRoutes);
+app.use("/roles", rolesRoutes);
+app.use("/stores", storeRoutes);
+app.use("/inventory", inventoryRoutes);
+app.use("/products", productRoutes);
+app.use("/customers", customerRoutes);
+app.use("/bills", billRoutes);
+app.use("/audits", auditRoutes);
+app.use("/discounts", discountRoutes);
+app.use("/stock-movements", stockMovementRoutes);
+app.use("/product-types", ProductTypeRouter);
+app.use("/product-brands", ProductBrandRouter);
+app.use("/units", UnitRouter);
+app.use("/damaged-goods", damageGoodsRoutes);
+app.delete("/product-brands/:id", authenticate, authorize("OWNER", "STAFF"), deactivateProductBrandController);
+app.delete("/product-types/:id", authenticate, authorize("OWNER", "STAFF"), deactivateProductTypeController);
+app.use((req, res) => {
+    res.status(404).json({
+        success: false,
+        message: `Route ${req.method} ${req.originalUrl} not found.`
+    });
+});
+app.use((err, req, res, next) => {
+    console.error("Unhandled error:", err);
+    const status = err.statusCode || err.status || 500;
+    const message = err.message || "An unexpected server error occurred.";
+    res.status(status).json({
+        success: false,
+        message
+    });
+});
+export default app;
+//# sourceMappingURL=app.js.map

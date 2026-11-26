@@ -1,0 +1,1494 @@
+/* ============================================================
+   BILLING.CSS
+   Voice Billing page-specific styles
+   ============================================================ */
+
+
+/* ============================================================
+   PREVENT DOUBLE SCROLLBAR (ROBUST FIX)
+   ============================================================ */
+
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  overflow-x: hidden;
+}
+
+#root,
+.App {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+
+/* ============================================================
+   HEADER BUTTONS
+   ============================================================ */
+
+.back-button,
+.profile-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.35rem;
+  height: 2.35rem;
+  padding: 0;
+  background-color: transparent;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.back-button img {
+  width: 1.5rem;
+  height: 1.5rem;
+  object-fit: contain;
+}
+
+.back-button:hover {
+  background-color: var(--color-border);
+}
+
+.profile-button img {
+  width: 1.25rem;
+  height: 1.25rem;
+  object-fit: contain;
+}
+
+.profile-button:hover {
+  background-color: var(--color-border);
+}
+
+
+/* ============================================================
+   MAIN CONTENT
+   ============================================================ */
+
+.main-container {
+  display: flex;
+  width: 100%;
+  min-height: calc(100vh - 4rem);
+  padding: 0.5em;
+  box-sizing: border-box;
+}
+
+.main-content {
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  padding-bottom: 2rem;
+  box-sizing: border-box;
+}
+
+.voice-billing-view {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  width: 100%;
+  min-width: 0;
+}
+
+
+/* ============================================================
+   VOICE SECTION
+   ============================================================ */
+
+.voice-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 0;
+  padding: 1rem;
+}
+
+.voice-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 7rem;
+  height: 7rem;
+  padding: 0;
+  background-color: var(--color-primary);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow:
+    0 0.3rem 0.8rem
+    rgba(11, 138, 106, 0.18);
+  transition:
+    background-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.voice-button:hover {
+  background-color: var(--color-primary-hover);
+  transform: scale(1.02);
+}
+
+.voice-button img {
+  width: 3rem;
+  height: 3rem;
+  object-fit: contain;
+}
+
+.voice-button-static {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  margin-top: 0.7rem;
+  color: var(--color-text-muted);
+  font-size: 1.25rem;
+}
+
+
+/* ------------------------------------------------------------
+   LISTENING STATE
+   ------------------------------------------------------------ */
+
+.voice-listening-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.voice-button.listening {
+  background-color: var(--color-danger);
+  box-shadow:
+    0 0 0 0 rgba(179, 38, 30, 0.45);
+  animation: voice-pulse 1.6s ease-out infinite;
+}
+
+.voice-button.listening:hover {
+  background-color: #942019;
+}
+
+@keyframes voice-pulse {
+  0% {
+    box-shadow:
+      0 0 0 0
+      rgba(179, 38, 30, 0.45);
+  }
+
+  70% {
+    box-shadow:
+      0 0 0 1.1rem
+      rgba(179, 38, 30, 0);
+  }
+
+  100% {
+    box-shadow:
+      0 0 0 0
+      rgba(179, 38, 30, 0);
+  }
+}
+
+.voice-timer {
+  color: var(--color-text);
+  font-size: 1.25rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.voice-stop-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.55rem 1.4rem;
+  color: var(--color-text);
+  font-size: 0.95rem;
+  font-weight: 600;
+  background-color: var(--color-surface);
+  border: 0.0625rem solid var(--color-border);
+  border-radius: 999rem;
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.voice-stop-button:hover {
+  color: var(--color-surface);
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.voice-stop-button:active {
+  background-color: var(--color-primary-active);
+  border-color: var(--color-primary-active);
+}
+
+
+/* ============================================================
+   VOICE OUTPUT
+   ============================================================ */
+
+.voice-output-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.4rem;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.voice-output-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  width: 100%;
+  padding: 1rem;
+  box-sizing: border-box;
+  background-color: var(--color-surface-alt);
+  border: 0.0625rem solid var(--color-border);
+  border-radius: 0.8rem;
+  box-shadow:
+    0 0.0625rem 0.125rem
+    rgba(0, 0, 0, 0.05);
+}
+
+.voice-output-container h3 {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+}
+
+.voice-output-container p {
+  min-height: 1.5rem;
+  margin: 0;
+  color: var(--color-text);
+  font-size: 1.1rem;
+  font-weight: 600;
+  word-break: break-word;
+}
+
+.inventory-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.inventory-status-item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.45rem 0.75rem;
+  color: var(--color-primary);
+  background-color: var(--color-primary-tint);
+  border-radius: 999rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+
+/* ============================================================
+   SEARCH BAR
+   ============================================================ */
+
+.bill-search-section {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  width: 100%;
+  margin-top: 0.4rem;
+  padding: 0 1rem;
+  box-sizing: border-box;
+}
+
+.bill-search-input {
+  width: 100%;
+  height: 2.75rem;
+  padding: 0 1rem;
+  box-sizing: border-box;
+  color: var(--color-text);
+  font-size: 0.9rem;
+  background-color: var(--color-surface);
+  border: 0.0625rem solid var(--color-border);
+  border-radius: 0.65rem;
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.bill-search-input::placeholder {
+  color: var(--color-text-placeholder, #7a8580);
+}
+
+.bill-search-input:disabled {
+  color: var(--color-text-muted);
+  background-color: var(--color-surface-alt);
+  cursor: not-allowed;
+}
+
+.bill-search-input:focus {
+  border-color: var(--color-primary);
+  box-shadow:
+    0 0 0 0.12rem
+    rgba(11, 138, 106, 0.08);
+}
+
+
+/* ============================================================
+   INVENTORY SEARCH RESULTS
+   ============================================================ */
+
+.bill-product-search-results {
+  width: 100%;
+  max-height: 18rem;
+  margin-top: 0.45rem;
+  overflow-y: auto;
+  background-color: var(--color-surface);
+  border: 0.0625rem solid var(--color-border);
+  border-radius: 0.65rem;
+  box-shadow:
+    0 0.25rem 0.8rem
+    rgba(0, 0, 0, 0.08);
+  box-sizing: border-box;
+  z-index: 100;
+}
+
+.bill-product-search-empty {
+  padding: 1rem;
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+
+/* ============================================================
+   SEARCH RESULT CARD
+   ============================================================ */
+
+.bill-product-search-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  padding: 0.8rem 0.9rem;
+  box-sizing: border-box;
+  background-color: var(--color-surface);
+  border-bottom: 0.0625rem solid var(--color-border);
+  transition: background-color 0.2s ease;
+}
+
+.bill-product-search-card:last-child {
+  border-bottom: none;
+}
+
+.bill-product-search-card:hover {
+  background-color: var(--color-surface-alt);
+}
+
+
+/* ============================================================
+   SEARCH RESULT INFORMATION
+   ============================================================ */
+
+.bill-product-search-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.bill-product-search-info h4 {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 0.95rem;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bill-product-search-info p {
+  margin: 0.25rem 0 0;
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+/* ============================================================
+   SEARCH RESULT DETAILS
+   ============================================================ */
+
+.bill-product-search-details {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 0.45rem;
+}
+
+.bill-product-search-details strong {
+  color: var(--color-primary);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.bill-product-search-details span {
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+
+/* ============================================================
+   STOCK STATUS
+   ============================================================ */
+
+.bill-product-search-details .stock-available {
+  padding: 0.2rem 0.5rem;
+  color: var(--color-primary);
+  background-color: var(--color-primary-tint);
+  border-radius: 999rem;
+  font-weight: 600;
+}
+
+.bill-product-search-details .stock-out {
+  padding: 0.2rem 0.5rem;
+  color: var(--color-danger);
+  background-color: var(--color-danger-tint);
+  border-radius: 999rem;
+  font-weight: 600;
+}
+
+
+/* ============================================================
+   ADD BUTTON
+   ============================================================ */
+
+.bill-product-add-button {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 4rem;
+  padding: 0.5rem 1rem;
+  color: var(--color-surface);
+  font-size: 0.85rem;
+  font-weight: 600;
+  background-color: var(--color-primary);
+  border: none;
+  border-radius: 0.4rem;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    transform 0.1s ease;
+}
+
+.bill-product-add-button:hover {
+  background-color: var(--color-primary-hover);
+}
+
+.bill-product-add-button:active {
+  background-color: var(--color-primary-active);
+  transform: scale(0.98);
+}
+
+.bill-product-add-button:disabled {
+  background-color: var(--color-border);
+  cursor: not-allowed;
+  transform: none;
+}
+
+
+/* ============================================================
+   BILL CONTAINER
+   ============================================================ */
+
+.bill-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 0.75rem;
+  padding: 1rem;
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+.bill-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.bill-header h2 {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+
+/* ============================================================
+   CUSTOMER SECTION
+   ============================================================ */
+
+.customer-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  width: 100%;
+  padding: 0.9rem;
+  box-sizing: border-box;
+  background-color: var(--color-surface-alt);
+  border: 0.0625rem solid var(--color-border);
+  border-radius: 0.7rem;
+}
+
+.customer-section .popup-field {
+  margin: 0;
+}
+
+
+/* ============================================================
+   SHARED POPUP-STYLE FIELD
+   ============================================================ */
+
+.popup-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  width: 100%;
+}
+
+.popup-field label {
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.popup-field input {
+  width: 100%;
+  height: 2.5rem;
+  padding: 0 0.9rem;
+  box-sizing: border-box;
+  color: var(--color-text);
+  font-size: 0.9rem;
+  background-color: var(--color-surface);
+  border: 0.0625rem solid var(--color-border);
+  border-radius: 0.55rem;
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.popup-field input:focus {
+  border-color: var(--color-primary);
+  box-shadow:
+    0 0 0 0.12rem
+    rgba(11, 138, 106, 0.08);
+}
+
+.popup-field input:disabled {
+  color: var(--color-text-muted);
+  background-color: var(--color-surface-alt);
+}
+
+
+/* ============================================================
+   CUSTOMER SEARCH ROW
+   ============================================================ */
+
+.customer-search-row {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  width: 100%;
+}
+
+.customer-search-row input {
+  flex: 1;
+  min-width: 0;
+}
+
+.customer-search-button {
+  flex-shrink: 0;
+  height: 2.5rem;
+  padding: 0 1.1rem;
+  color: var(--color-surface);
+  font-size: 0.85rem;
+  font-weight: 600;
+  background-color: var(--color-primary);
+  border: none;
+  border-radius: 0.55rem;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.customer-search-button:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+}
+
+.customer-search-button:active:not(:disabled) {
+  background-color: var(--color-primary-active);
+}
+
+.customer-search-button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+
+/* ============================================================
+   CUSTOMER FOUND
+   ============================================================ */
+
+.customer-found-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.7rem 0.8rem;
+  box-sizing: border-box;
+  background-color: var(--color-primary-tint);
+  border: 0.0625rem solid var(--color-primary-tint-strong);
+  border-radius: 0.55rem;
+}
+
+.customer-found-card > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.customer-found-card strong {
+  color: var(--color-primary);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.customer-found-card span {
+  color: var(--color-text);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.customer-found-card button {
+  flex-shrink: 0;
+  padding: 0.4rem 0.75rem;
+  color: var(--color-primary);
+  font-size: 0.78rem;
+  font-weight: 600;
+  background-color: var(--color-surface);
+  border: 0.0625rem solid var(--color-primary-tint-strong);
+  border-radius: 0.4rem;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.customer-found-card button:hover {
+  color: var(--color-surface);
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+
+/* ============================================================
+   CUSTOMER SEARCH MESSAGE
+   ============================================================ */
+
+.customer-search-message {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  box-sizing: border-box;
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  background-color: var(--color-surface);
+  border: 0.0625rem solid var(--color-border);
+  border-radius: 0.5rem;
+}
+
+.customer-search-message.success {
+  color: var(--color-primary);
+  background-color: var(--color-primary-tint);
+  border-color: var(--color-primary-tint-strong);
+}
+
+.add-customer-button {
+  flex-shrink: 0;
+  padding: 0.45rem 0.8rem;
+  color: var(--color-primary);
+  font-size: 0.8rem;
+  font-weight: 700;
+  background-color: var(--color-surface);
+  border: 0.0625rem solid var(--color-primary);
+  border-radius: 0.45rem;
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.add-customer-button:hover:not(:disabled) {
+  color: var(--color-surface);
+  background-color: var(--color-primary);
+}
+
+.add-customer-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+
+/* ============================================================
+   DESKTOP BILL TABLE
+   ============================================================ */
+
+.bill-table-container {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  border: 0.0625rem solid var(--color-border);
+  border-radius: 0.7rem;
+}
+
+.bill-table {
+  width: 100%;
+  min-width: 42rem;
+  border-collapse: collapse;
+}
+
+.bill-table thead th {
+  padding: 0.75rem 0.9rem;
+  color: var(--color-text-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-align: left;
+  text-transform: uppercase;
+  background-color: var(--color-surface-alt);
+  border-bottom: 0.0625rem solid var(--color-border);
+}
+
+.bill-table tbody td {
+  padding: 0.75rem 0.9rem;
+  color: var(--color-text);
+  font-size: 0.88rem;
+  border-bottom: 0.0625rem solid var(--color-border);
+  vertical-align: middle;
+}
+
+.bill-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.bill-item-name {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.bill-item-details {
+  margin-top: 0.15rem;
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+}
+
+.bill-empty-row {
+  padding: 1.5rem 0.9rem;
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+
+/* ============================================================
+   ROW ACTIONS
+   ============================================================ */
+
+.bill-item-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.bill-edit-button,
+.bill-delete-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  background-color: var(--color-surface-alt);
+  border: 0.0625rem solid var(--color-border);
+  border-radius: 0.45rem;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.bill-edit-button img,
+.bill-delete-button img {
+  width: 1rem;
+  height: 1rem;
+  object-fit: contain;
+}
+
+.bill-edit-button:hover {
+  background-color: var(--color-primary-tint);
+  border-color: var(--color-primary);
+}
+
+.bill-delete-button:hover {
+  background-color: var(--color-danger-tint);
+  border-color: var(--color-danger);
+}
+
+
+/* ============================================================
+   TABLE / CARD QUANTITY STEPPER
+   ============================================================ */
+
+.table-qty-selector {
+  display: inline-flex;
+  align-items: center;
+  background-color: var(--color-surface);
+  border: 0.0625rem solid var(--color-border);
+  border-radius: 0.4rem;
+  overflow: hidden;
+}
+
+.table-qty-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  color: var(--color-text);
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1;
+  background-color: var(--color-surface-alt);
+  border: none;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.table-qty-btn:hover:not(:disabled) {
+  color: var(--color-surface);
+  background-color: var(--color-primary);
+}
+
+.table-qty-btn:active:not(:disabled) {
+  background-color: var(--color-primary-active);
+}
+
+.table-qty-btn:disabled {
+  color: var(--color-text-muted);
+  background-color: var(--color-surface-alt);
+  cursor: not-allowed;
+}
+
+.table-qty-value {
+  min-width: 1.6rem;
+  padding: 0 0.3rem;
+  color: var(--color-text);
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+
+/* ============================================================
+   MOBILE BILL CARDS
+   ============================================================ */
+
+.voice-bill-cards-container {
+  display: none;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.voice-bill-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.9rem;
+  background-color: var(--color-surface);
+  border: 0.0625rem solid var(--color-border);
+  border-radius: 0.7rem;
+}
+
+.voice-bill-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.voice-bill-card-header strong {
+  color: var(--color-text);
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.voice-bill-card-details {
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+}
+
+.voice-bill-card-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}
+
+.voice-bill-card-row strong {
+  color: var(--color-text);
+}
+
+.voice-bill-empty-card {
+  padding: 1.5rem 0.9rem;
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  text-align: center;
+  background-color: var(--color-surface-alt);
+  border: 0.0625rem dashed var(--color-border);
+  border-radius: 0.7rem;
+}
+
+
+/* ============================================================
+   BILL SUMMARY
+   ============================================================ */
+
+.bill-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 1rem;
+  background-color: var(--color-surface-alt);
+  border: 0.0625rem solid var(--color-border);
+  border-radius: 0.7rem;
+}
+
+.bill-summary-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  color: var(--color-text-muted);
+  font-size: 0.88rem;
+}
+
+.bill-summary-row strong {
+  color: var(--color-text);
+}
+
+.bill-discount-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  width: 100%;
+  min-width: 0;
+  padding-top: 0.3rem;
+}
+
+.bill-discount-section label {
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+/* Discount dropdown: fixed to green accent, contained within its box on every breakpoint */
+.bill-discount-section select {
+  width: 100%;
+  max-width: 100%;
+  height: 2.5rem;
+  padding: 0 0.75rem;
+  box-sizing: border-box;
+  color: var(--color-text);
+  font-size: 0.88rem;
+  background-color: var(--color-surface);
+  border: 0.0625rem solid var(--color-border);
+  border-radius: 0.55rem;
+  outline: none;
+  accent-color: var(--color-primary);
+  color-scheme: light;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  transition: border-color 0.2s ease;
+}
+
+.bill-discount-section select:focus,
+.bill-discount-section select:focus-visible {
+  border-color: var(--color-primary);
+  outline: none;
+  accent-color: var(--color-primary);
+  box-shadow:
+    0 0 0 0.12rem
+    rgba(11, 138, 106, 0.08);
+}
+
+.bill-discount-section select option {
+  color: var(--color-text);
+  background-color: var(--color-surface);
+}
+
+.discount-notice {
+  padding: 0.5rem 0.65rem;
+  background-color: #fff4e0;
+  color: #8a5a00;
+  border: 0.0625rem solid #f5d59a;
+  border-radius: 0.4rem;
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+
+.bill-summary-grand-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 0.3rem;
+  padding-top: 0.7rem;
+  color: var(--color-text);
+  font-size: 1.05rem;
+  font-weight: 700;
+  border-top: 0.0625rem solid var(--color-border);
+}
+
+.bill-summary-grand-total strong {
+  color: var(--color-primary);
+  font-size: 1.2rem;
+}
+
+
+/* ============================================================
+   GENERATE BILL
+   ============================================================ */
+
+.bill-action-section {
+  display: flex;
+  width: 100%;
+}
+
+.generate-bill-button {
+  width: 100%;
+  padding: 0.9rem 1rem;
+  color: var(--color-surface);
+  font-size: 1rem;
+  font-weight: 700;
+  background-color: var(--color-primary);
+  border: none;
+  border-radius: 0.65rem;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    transform 0.1s ease;
+}
+
+.generate-bill-button:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+}
+
+.generate-bill-button:active:not(:disabled) {
+  background-color: var(--color-primary-active);
+  transform: scale(0.99);
+}
+
+.generate-bill-button:disabled {
+  background-color: var(--color-border);
+  cursor: not-allowed;
+}
+
+
+/* ============================================================
+   EDIT ITEM POPUP
+   ============================================================ */
+
+.billing-popup-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background-color: rgba(20, 24, 22, 0.45);
+  z-index: 1000;
+}
+
+.pop-up {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  width: 100%;
+  max-width: 24rem;
+  max-height: calc(100vh - 2rem);
+  padding: 1.5rem;
+  box-sizing: border-box;
+  overflow-y: auto;
+  background-color: var(--color-surface);
+  border-radius: 0.9rem;
+  box-shadow:
+    0 0.75rem 2rem
+    rgba(0, 0, 0, 0.18);
+}
+
+.pop-up h2 {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.popup-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.popup-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.6rem;
+}
+
+.popup-buttons button {
+  padding: 0.55rem 1.1rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.popup-buttons button:first-child {
+  color: var(--color-text);
+  background-color: var(--color-surface);
+  border: 0.0625rem solid var(--color-border);
+}
+
+.popup-buttons button:first-child:hover {
+  background-color: var(--color-surface-alt);
+}
+
+.popup-buttons button:last-child {
+  color: var(--color-surface);
+  background-color: var(--color-primary);
+  border: none;
+}
+
+.popup-buttons button:last-child:hover {
+  background-color: var(--color-primary-hover);
+}
+
+
+/* ============================================================
+   BILL ITEMS GRAPHIC FIX
+   ============================================================ */
+
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.actions img {
+  width: 100%;
+  height: auto;
+  max-height: 120px;
+  object-fit: contain;
+}
+
+
+/* ============================================================
+   QUANTITY SELECTOR
+   Used inside the edit-item popup
+   ============================================================ */
+
+.qty-selector {
+  display: inline-flex;
+  align-items: center;
+  background-color: var(--color-surface);
+  border: 0.0625rem solid var(--color-border);
+  border-radius: 0.4rem;
+  overflow: hidden;
+}
+
+.qty-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  padding: 0;
+  color: var(--color-text);
+  font-size: 1.1rem;
+  font-weight: 500;
+  background-color: var(--color-surface-alt);
+  border: none;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.qty-btn:hover:not(:disabled) {
+  background-color: var(--color-primary);
+  color: var(--color-surface);
+}
+
+.qty-btn:active:not(:disabled) {
+  background-color: var(--color-primary-active);
+}
+
+.qty-btn:disabled {
+  color: var(--color-text-muted);
+  background-color: var(--color-surface-alt);
+  cursor: not-allowed;
+}
+
+.qty-input {
+  width: 2.5rem;
+  height: 2.2rem;
+  padding: 0;
+  color: var(--color-text);
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-align: center;
+  background-color: var(--color-surface);
+  border: none;
+  outline: none;
+}
+
+
+/* ============================================================
+   RESPONSIVE — TABLET
+   ============================================================ */
+
+@media (max-width: 48rem) {
+
+  .bill-container {
+    padding: 0.75rem;
+  }
+
+  .voice-output-section {
+    padding: 0.75rem;
+  }
+
+  .bill-search-section {
+    padding: 0 0.75rem;
+  }
+
+  .bill-table-container {
+    display: none;
+  }
+
+  .voice-bill-cards-container {
+    display: flex;
+  }
+
+  .customer-section {
+    padding: 0.8rem;
+  }
+
+  .bill-discount-section select {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+}
+
+
+/* ============================================================
+   RESPONSIVE — MOBILE
+   ============================================================ */
+
+@media (max-width: 30rem) {
+
+  .voice-section {
+    padding: 0.75rem;
+  }
+
+  .voice-button {
+    width: 6rem;
+    height: 6rem;
+  }
+
+  .voice-button img {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .voice-button-static {
+    font-size: 1rem;
+  }
+
+  .voice-output-section {
+    padding: 0.5rem;
+  }
+
+  .voice-output-container {
+    padding: 0.8rem;
+  }
+
+  .voice-output-container p {
+    font-size: 0.95rem;
+  }
+
+  .bill-search-section {
+    padding: 0 0.5rem;
+  }
+
+  .bill-container {
+    gap: 0.8rem;
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+  }
+
+  .bill-header h2 {
+    font-size: 1rem;
+  }
+
+  .customer-section {
+    padding: 0.75rem;
+  }
+
+  .customer-search-row {
+    gap: 0.4rem;
+  }
+
+  .customer-search-button {
+    padding: 0 0.8rem;
+  }
+
+  .customer-found-card {
+    align-items: flex-start;
+  }
+
+  .customer-search-message {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .add-customer-button {
+    width: 100%;
+  }
+
+  .voice-bill-card {
+    padding: 0.8rem;
+  }
+
+  .bill-summary {
+    padding: 0.85rem;
+  }
+
+  .bill-discount-section select {
+    max-width: 100%;
+    box-sizing: border-box;
+    font-size: 0.85rem;
+  }
+
+  .generate-bill-button {
+    padding: 0.8rem;
+  }
+
+  .pop-up {
+    padding: 1.1rem;
+    border-radius: 0.75rem;
+  }
+
+  .popup-buttons {
+    flex-direction: column-reverse;
+    width: 100%;
+  }
+
+  .popup-buttons button {
+    width: 100%;
+  }
+}
+
+
+/* ============================================================
+   VERY SMALL MOBILE — 360px
+   ============================================================ */
+
+@media (max-width: 22.5rem) {
+
+  .customer-search-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .customer-search-button {
+    width: 100%;
+  }
+
+  .voice-bill-card-row {
+    font-size: 0.8rem;
+  }
+
+  .table-qty-btn {
+    width: 1.6rem;
+    height: 1.6rem;
+  }
+
+  .table-qty-value {
+    min-width: 1.4rem;
+  }
+
+  .bill-discount-section select {
+    max-width: 100%;
+    box-sizing: border-box;
+    font-size: 0.8rem;
+    height: 2.35rem;
+  }
+
+  .bill-edit-button,
+  .bill-delete-button {
+    width: 1.85rem;
+    height: 1.85rem;
+  }
+}

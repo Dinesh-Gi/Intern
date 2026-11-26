@@ -1,0 +1,14 @@
+import { Router } from "express";
+import { createDamagedGoods, getAllDamagedGoods, getDamagedGoodsById, getDamagedGoodsByInventory, updateDamagedGoods, deactivateDamagedGoods } from "../controller/DamageGoodsControllerf.js";
+import { authenticate } from "../middleware/Authenticate.js";
+import { authorize } from "../middleware/Authorize.js";
+const DamageGoodsRouter = Router();
+DamageGoodsRouter.use(authenticate);
+DamageGoodsRouter.post("/", authorize("OWNER", "STAFF"), createDamagedGoods);
+DamageGoodsRouter.get("/", authorize("OWNER", "STAFF"), getAllDamagedGoods);
+DamageGoodsRouter.get("/inventory/:inventoryId", authorize("OWNER", "STAFF"), getDamagedGoodsByInventory);
+DamageGoodsRouter.get("/:id", authorize("OWNER", "STAFF"), getDamagedGoodsById);
+DamageGoodsRouter.put("/:id", authorize("OWNER", "STAFF"), updateDamagedGoods);
+DamageGoodsRouter.patch("/deactivate/:id", authorize("OWNER", "STAFF"), deactivateDamagedGoods);
+export default DamageGoodsRouter;
+//# sourceMappingURL=DamageGood.routes.js.map

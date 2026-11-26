@@ -1,0 +1,100 @@
+const API_URL = process.env.REACT_APP_API_URL;
+
+function getToken() {
+  return sessionStorage.getItem("token");
+}
+
+function getStoredUser() {
+  try {
+    const raw = sessionStorage.getItem("user");
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Returns the store ID of the currently logged in user.
+ */
+export function getCurrentStoreId() {
+  const user = getStoredUser();
+  return user?.storeId ?? null;
+}
+
+/**
+ * Returns the currently logged in user object (as saved by AuthContext).
+ */
+export function getCurrentUser() {
+  return getStoredUser();
+}
+
+/**
+ * Generic authenticated request helper used by every service module.
+**/
+export async function apiRequest(path, { method = "GET", body, params } = {}) {
+  let url = `${API_URL}${path}`;
+
+  if (params) {
+    const query = new URLSearchParams();
+
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== "") {
+        query.append(key, value);
+      }
+    });
+
+    const queryString = query.toString();
+
+    if (queryString) {
+      url += `?${queryString}`;
+    }
+  }
+
+  const token = getToken();
+
+  const response = await fetch(url, {
+    method,
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: body !== undefined ? JSON.stringify(body) : undefined,
+  });
+
+  let result = null;
+
+  try {
+    result = await response.json();
+  } catch {
+    result = null;
+  }
+
+  if (response.status === 401) {
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("user");
+
+    if (!window.location.pathname.startsWith("/login")) {
+      window.location.href = "/login?expired=1";
+    }
+
+    const sessionError = new Error(
+      (result && (result.message || result.error)) ||
+        "Your session has expired. Please log in again."
+    );
+    sessionError.name = "SessionExpiredError";
+    sessionError.isSessionExpired = true;
+    throw sessionError;
+  }
+
+  if (!response.ok || (result && result.success === false)) {
+    const message =
+      (result && (result.message || result.error)) ||
+      `Request failed with status ${response.status}`;
+
+    throw new Error(message);
+  }
+
+  return result || {};
+}
+
+export { API_URL };

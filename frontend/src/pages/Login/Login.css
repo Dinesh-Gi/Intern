@@ -1,0 +1,1225 @@
+
+/* ============================================================
+   LOGIN / SIGNUP PAGE
+============================================================ */
+
+.login-signup-page {
+  width: 100%;
+  min-height: 100vh;
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  padding: 48px 20px;
+
+  background: var(--color-surface-alt);
+
+  font-family: var(--font-family-base);
+}
+
+/* ============================================================
+   HEADER
+============================================================ */
+
+.auth-header-block {
+  width: 100%;
+  max-width: 380px;
+
+  text-align: center;
+
+  margin-bottom: 28px;
+}
+
+.auth-icon-badge {
+  width: 48px;
+  height: 48px;
+
+  margin: 0 auto 16px;
+
+  border-radius: 50%;
+
+  background: var(--color-primary-tint);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: var(--color-primary);
+}
+
+.auth-icon-badge img {
+  width: 24px;
+  height: 24px;
+
+  object-fit: contain;
+}
+
+.auth-header-block h1 {
+  font-size: 22px;
+  font-weight: 600;
+
+  color: var(--color-primary-strong);
+
+  margin: 0 0 6px;
+}
+
+.auth-header-block p {
+  font-size: 14px;
+
+  color: var(--color-text-muted);
+
+  margin: 0;
+
+  line-height: 1.5;
+}
+
+/* ============================================================
+   CARD
+============================================================ */
+
+.auth-card {
+  width: 100%;
+  max-width: 380px;
+
+  background: var(--color-surface);
+
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+
+  padding: 24px;
+
+  box-sizing: border-box;
+}
+
+/* ============================================================
+   TABS
+============================================================ */
+
+.auth-tabs {
+  width: 100%;
+
+  display: flex;
+
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+
+  overflow: hidden;
+
+  margin-bottom: 20px;
+
+  box-sizing: border-box;
+}
+
+.auth-tab {
+  flex: 1;
+  min-width: 0;
+
+  padding: 10px 0;
+
+  border: none;
+
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+
+  font-size: 14px;
+  font-weight: 500;
+
+  cursor: pointer;
+
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.auth-tab:not(:last-child) {
+  border-right: 1px solid var(--color-border);
+}
+
+.auth-tab.active {
+  background:var(--color-primary);
+  color: var(--color-surface);
+}
+
+.auth-tab:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ============================================================
+   FORM ROWS
+============================================================ */
+
+.auth-name-row {
+  width: 100%;
+
+  display: flex;
+
+  gap: 10px;
+
+  margin-bottom: 12px;
+}
+
+.auth-name-row .auth-input-wrap {
+  flex: 1;
+  min-width: 0;
+
+  margin-bottom: 0;
+}
+
+/* ============================================================
+   INPUT WRAPPER
+============================================================ */
+
+.auth-input-wrap {
+  width: 100%;
+
+  position: relative;
+
+  margin-bottom: 12px;
+}
+
+/* ============================================================
+   MAIN INPUTS
+============================================================ */
+
+.auth-input-wrap input,
+.auth-input-wrap select {
+  width: 100%;
+
+  box-sizing: border-box;
+
+  padding: 11px 14px;
+
+  border: 1px solid var(--color-border);
+  border-radius: 9px;
+
+  font-size: 14px;
+
+  color: var(--color-primary-strong);
+
+  background: var(--color-primary-tint);
+
+  outline: none;
+
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
+}
+
+.auth-input-wrap input::placeholder {
+  color: var(--color-text-placeholder, #8fac96);
+}
+
+.auth-input-wrap input:focus,
+.auth-input-wrap select:focus {
+  border-color: var(--color-primary);
+  background: var(--color-surface);
+}
+
+.auth-input-wrap input:disabled,
+.auth-input-wrap select:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ============================================================
+   ROLE SELECT
+============================================================ */
+
+.auth-input-wrap select {
+  appearance: auto;
+
+  cursor: pointer;
+}
+
+.auth-input-wrap select option {
+  color: var(--color-primary-strong);
+  background: var(--color-surface);
+}
+
+/* ============================================================
+   PASSWORD EYE
+============================================================ */
+
+.auth-eye-toggle {
+  position: absolute;
+
+  right: 10px;
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  border: none;
+
+  background: transparent;
+
+  cursor: pointer;
+
+  font-size: 15px;
+
+  line-height: 1;
+
+  padding: 4px;
+}
+
+.auth-eye-toggle:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ============================================================
+   LOGIN OPTIONS ROW
+============================================================ */
+
+.auth-label-row {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+
+  margin-bottom: 16px;
+}
+
+.auth-checkbox-row {
+  display: flex;
+  align-items: center;
+
+  gap: 6px;
+
+  font-size: 13px;
+
+  color: var(--color-text-muted);
+
+  cursor: pointer;
+}
+
+.auth-checkbox-row input {
+  accent-color: var(--color-primary);
+
+  cursor: pointer;
+}
+
+.auth-forgot-link {
+  flex-shrink: 0;
+
+  border: none;
+
+  background: transparent;
+
+  color: var(--color-primary);
+
+  font-size: 13px;
+  font-weight: 500;
+
+  cursor: pointer;
+
+  padding: 0;
+}
+
+/* ============================================================
+   FEEDBACK
+============================================================ */
+
+.auth-feedback {
+  width: 100%;
+
+  box-sizing: border-box;
+
+  font-size: 13px;
+
+  line-height: 1.4;
+
+  padding: 10px 12px;
+
+  border-radius: 8px;
+
+  margin-bottom: 14px;
+}
+
+.auth-feedback.error {
+  background: var(--color-danger-tint);
+
+  color: var(--color-danger);
+
+  border: 1px solid #f6cfcb;
+}
+
+.auth-feedback.success {
+  background: var(--color-primary-tint);
+
+  color: var(--color-primary);
+
+  border: 1px solid var(--color-primary-tint-strong);
+}
+
+/* ============================================================
+   SUBMIT BUTTON
+============================================================ */
+
+.auth-submit {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 6px;
+
+  padding: 12px 0;
+
+  border: none;
+
+  border-radius: 9px;
+
+  background: var(--color-primary);
+
+  color: var(--color-surface);
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.15s ease,
+    opacity 0.15s ease;
+}
+
+.auth-submit:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+}
+
+.auth-submit:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.auth-submit-arrow {
+  font-size: 15px;
+}
+
+/* ============================================================
+   STORE POPUP OVERLAY
+============================================================ */
+
+.store-popup-overlay {
+  position: fixed;
+
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  background: rgba(20, 50, 28, 0.45);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  box-sizing: border-box;
+
+  z-index: 1000;
+
+  overflow-y: auto;
+}
+
+/* ============================================================
+   STORE POPUP
+============================================================ */
+
+.store-popup {
+  width: 100%;
+
+  max-width: 380px;
+
+  background: var(--color-surface);
+
+  border-radius: 14px;
+
+  padding: 24px;
+
+  box-sizing: border-box;
+
+  max-height: 90vh;
+
+  overflow-y: auto;
+
+  box-shadow:
+    0 18px 50px rgba(20, 50, 28, 0.18);
+}
+
+/* ============================================================
+   POPUP HEADER
+============================================================ */
+
+.store-popup-header {
+  width: 100%;
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 12px;
+
+  margin-bottom: 18px;
+}
+
+.store-popup-header h2 {
+  font-size: 17px;
+
+  font-weight: 600;
+
+  color: var(--color-primary-strong);
+
+  margin: 0 0 4px;
+
+  line-height: 1.3;
+}
+
+.store-popup-header p {
+  font-size: 13px;
+
+  color: var(--color-text-muted);
+
+  margin: 0;
+
+  line-height: 1.4;
+}
+
+.store-popup-close {
+  flex-shrink: 0;
+
+  border: none;
+
+  background: transparent;
+
+  font-size: 20px;
+
+  line-height: 1;
+
+  color: var(--color-text-placeholder, #8fac96);
+
+  cursor: pointer;
+
+  padding: 2px 6px;
+}
+
+.store-popup-close:hover:not(:disabled) {
+  color: var(--color-primary-strong);
+}
+
+.store-popup-close:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* ============================================================
+   POPUP FORM
+============================================================ */
+
+.store-popup-form {
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 12px;
+
+  max-height: 70vh;
+
+  overflow-y: auto;
+}
+
+/* ============================================================
+   POPUP INPUT
+============================================================ */
+
+.popup-input-wrap {
+  width: 100%;
+}
+
+.popup-input-wrap label {
+  display: block;
+
+  font-size: 12px;
+
+  font-weight: 500;
+
+  color: var(--color-text-muted);
+
+  margin-bottom: 5px;
+}
+
+.popup-input-wrap input {
+  width: 100%;
+
+  box-sizing: border-box;
+
+  padding: 10px 12px;
+
+  border: 1px solid var(--color-border);
+
+  border-radius: 8px;
+
+  font-size: 14px;
+
+  color: var(--color-primary-strong);
+
+  background: var(--color-primary-tint);
+
+  outline: none;
+
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
+}
+
+.popup-input-wrap input::placeholder {
+  color: var(--color-text-placeholder, #8fac96);
+}
+
+.popup-input-wrap input:focus {
+  border-color: var(--color-primary);
+
+  background: var(--color-surface);
+}
+
+.popup-input-wrap input:disabled {
+  cursor: not-allowed;
+
+  opacity: 0.6;
+}
+
+/* ============================================================
+   STAFF STORE SEARCH
+============================================================ */
+
+.store-popup-form .popup-input-wrap > div {
+  width: 100%;
+
+  display: flex;
+
+  align-items: stretch;
+
+  gap: 8px;
+}
+
+.store-popup-form .popup-input-wrap > div input {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Search button */
+
+.store-popup-form .popup-input-wrap > div .popup-create-button {
+  flex: 0 0 auto;
+
+  width: auto;
+
+  min-width: 88px;
+
+  padding: 10px 14px;
+}
+
+/* ============================================================
+   STORE SEARCH RESULTS
+============================================================ */
+
+.store-search-results {
+  width: 100%;
+
+  box-sizing: border-box;
+}
+
+.store-search-results > label {
+  display: block;
+
+  font-size: 12px;
+
+  font-weight: 500;
+
+  color: var(--color-text-muted);
+
+  margin-bottom: 6px;
+}
+
+/* ============================================================
+   STORE RESULT BUTTONS
+============================================================ */
+
+.store-search-results button {
+  width: 100%;
+
+  display: block;
+
+  box-sizing: border-box;
+
+  text-align: left;
+
+  margin-top: 8px;
+
+  padding: 12px;
+
+  border: 1px solid var(--color-border);
+
+  border-radius: 8px;
+
+  background: var(--color-surface);
+
+  color: var(--color-primary-strong);
+
+  font-size: 13px;
+
+  line-height: 1.5;
+
+  cursor: pointer;
+
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.store-search-results button:hover:not(:disabled) {
+  border-color: var(--color-primary);
+
+  background: var(--color-primary-tint);
+}
+
+.store-search-results button:disabled {
+  cursor: not-allowed;
+
+  opacity: 0.6;
+}
+
+/* ============================================================
+   SELECTED STORE
+============================================================ */
+
+.store-selected-box {
+  width: 100%;
+
+  box-sizing: border-box;
+
+  padding: 12px;
+
+  border-radius: 8px;
+
+  background: var(--color-primary-tint);
+
+  border: 1px solid var(--color-primary);
+
+  color: var(--color-primary-strong);
+}
+
+.store-selected-box strong {
+  display: block;
+
+  font-size: 13px;
+
+  color: var(--color-primary-strong);
+
+  margin-bottom: 5px;
+}
+
+.store-selected-box p {
+  margin: 4px 0 0;
+
+  font-size: 13px;
+
+  line-height: 1.4;
+
+  color: var(--color-text-muted);
+}
+
+/* ============================================================
+   POPUP ACTIONS
+============================================================ */
+
+.store-popup-actions {
+  width: 100%;
+
+  display: flex;
+
+  gap: 10px;
+
+  margin-top: 6px;
+}
+
+.popup-cancel-button,
+.popup-create-button {
+  flex: 1;
+
+  min-width: 0;
+
+  padding: 11px 0;
+
+  border-radius: 9px;
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.15s ease,
+    opacity 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.popup-cancel-button {
+  border: 1px solid var(--color-border);
+
+  background: var(--color-surface);
+
+  color: var(--color-primary-strong);
+}
+
+.popup-cancel-button:hover:not(:disabled) {
+  background: var(--color-surface-alt);
+
+  border-color: var(--color-primary-tint-strong);
+}
+
+.popup-create-button {
+  border: none;
+
+  background: var(--color-primary);
+
+  color: var(--color-surface);
+}
+
+.popup-create-button:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+}
+
+.popup-cancel-button:disabled,
+.popup-create-button:disabled {
+  cursor: not-allowed;
+
+  opacity: 0.6;
+}
+
+/* ============================================================
+   POPUP SCROLLBAR
+============================================================ */
+
+.store-popup::-webkit-scrollbar,
+.store-popup-form::-webkit-scrollbar {
+  width: 6px;
+}
+
+.store-popup::-webkit-scrollbar-track,
+.store-popup-form::-webkit-scrollbar-track {
+  background: var(--color-surface-alt);
+
+  border-radius: 10px;
+}
+
+.store-popup::-webkit-scrollbar-thumb,
+.store-popup-form::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+
+  border-radius: 10px;
+}
+
+.store-popup::-webkit-scrollbar-thumb:hover,
+.store-popup-form::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary-tint-strong);
+}
+
+/* ============================================================
+   LARGE DESKTOP
+   1440px and above
+============================================================ */
+
+@media (min-width: 1440px) {
+  .login-signup-page {
+    padding: 60px 24px;
+  }
+
+  .auth-header-block {
+    max-width: 400px;
+
+    margin-bottom: 32px;
+  }
+
+  .auth-card {
+    max-width: 400px;
+
+    padding: 28px;
+  }
+
+  .store-popup {
+    max-width: 400px;
+
+    padding: 28px;
+  }
+}
+
+/* ============================================================
+   DESKTOP / LAPTOP
+   1024px - 1439px
+============================================================ */
+
+@media (min-width: 1024px) and (max-width: 1439px) {
+  .login-signup-page {
+    padding: 48px 24px;
+  }
+}
+
+/* ============================================================
+   TABLET
+   768px - 1023px
+============================================================ */
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .login-signup-page {
+    padding: 40px 24px;
+  }
+
+  .auth-header-block {
+    margin-bottom: 24px;
+  }
+
+  .auth-card {
+    max-width: 400px;
+  }
+
+  .store-popup {
+    max-width: 400px;
+  }
+}
+
+/* ============================================================
+   MOBILE
+   481px - 767px
+============================================================ */
+
+@media (min-width: 481px) and (max-width: 767px) {
+  .login-signup-page {
+    min-height: 100vh;
+
+    padding: 36px 20px;
+
+    justify-content: center;
+  }
+
+  .auth-header-block {
+    max-width: 400px;
+
+    margin-bottom: 22px;
+  }
+
+  .auth-card {
+    max-width: 420px;
+
+    padding: 22px;
+  }
+
+  .store-popup {
+    max-width: 420px;
+
+    padding: 22px;
+  }
+}
+
+/* ============================================================
+   SMALL MOBILE
+   360px - 480px
+============================================================ */
+
+@media (max-width: 480px) {
+  .login-signup-page {
+    min-height: 100vh;
+
+    padding: 28px 14px;
+
+    justify-content: center;
+  }
+
+  .auth-header-block {
+    max-width: 100%;
+
+    margin-bottom: 20px;
+  }
+
+  .auth-icon-badge {
+    width: 44px;
+    height: 44px;
+
+    margin-bottom: 12px;
+  }
+
+  .auth-icon-badge img {
+    width: 22px;
+    height: 22px;
+  }
+
+  .auth-header-block h1 {
+    font-size: 20px;
+  }
+
+  .auth-header-block p {
+    font-size: 13px;
+  }
+
+  .auth-card {
+    max-width: 100%;
+
+    padding: 18px;
+
+    border-radius: 12px;
+  }
+
+  .auth-tabs {
+    margin-bottom: 18px;
+  }
+
+  .auth-tab {
+    padding: 10px 0;
+
+    font-size: 13px;
+  }
+
+  .auth-name-row {
+    flex-direction: column;
+
+    gap: 12px;
+
+    margin-bottom: 12px;
+  }
+
+  .auth-name-row .auth-input-wrap {
+    margin-bottom: 0;
+  }
+
+  .auth-label-row {
+    align-items: flex-start;
+
+    gap: 8px;
+  }
+
+  .auth-checkbox-row {
+    font-size: 12px;
+  }
+
+  .auth-forgot-link {
+    font-size: 12px;
+  }
+
+  /* Popup */
+
+  .store-popup-overlay {
+    align-items: center;
+
+    padding: 14px;
+  }
+
+  .store-popup {
+    max-width: 100%;
+
+    padding: 18px;
+
+    border-radius: 12px;
+
+    max-height: 92vh;
+  }
+
+  .store-popup-form {
+    max-height: 72vh;
+  }
+
+  .store-popup-actions {
+    gap: 8px;
+  }
+
+  .popup-cancel-button,
+  .popup-create-button {
+    padding: 10px 0;
+
+    font-size: 13px;
+  }
+
+  /* Staff search */
+
+  .store-popup-form .popup-input-wrap > div {
+    flex-direction: column;
+
+    gap: 8px;
+  }
+
+  .store-popup-form .popup-input-wrap > div input {
+    width: 100%;
+  }
+
+  .store-popup-form .popup-input-wrap > div .popup-create-button {
+    width: 100%;
+
+    min-width: 0;
+  }
+}
+
+/* ============================================================
+   VERY SMALL MOBILE
+   Below 360px
+============================================================ */
+
+@media (max-width: 359px) {
+  .login-signup-page {
+    padding: 22px 10px;
+  }
+
+  .auth-card {
+    padding: 15px;
+  }
+
+  .auth-header-block {
+    margin-bottom: 16px;
+  }
+
+  .auth-header-block h1 {
+    font-size: 19px;
+  }
+
+  .auth-header-block p {
+    font-size: 12px;
+  }
+
+  .auth-tab {
+    font-size: 12px;
+
+    padding: 9px 0;
+  }
+
+  .auth-input-wrap input,
+  .auth-input-wrap select {
+    padding: 10px 11px;
+
+    font-size: 13px;
+  }
+
+  .auth-submit {
+    padding: 11px 0;
+
+    font-size: 13px;
+  }
+
+  .store-popup {
+    padding: 15px;
+  }
+
+  .store-popup-header h2 {
+    font-size: 16px;
+  }
+
+  .store-popup-header p {
+    font-size: 12px;
+  }
+
+  .popup-input-wrap input {
+    padding: 9px 10px;
+
+    font-size: 13px;
+  }
+
+  .store-search-results button {
+    padding: 10px;
+
+    font-size: 12px;
+  }
+}
+
+/* ============================================================
+   SHORT DESKTOP / LAPTOP HEIGHT
+   Prevents content from being cut off
+============================================================ */
+
+@media (min-width: 768px) and (max-height: 700px) {
+  .login-signup-page {
+    justify-content: flex-start;
+
+    padding-top: 28px;
+    padding-bottom: 28px;
+
+    overflow-y: auto;
+  }
+
+  .auth-header-block {
+    margin-bottom: 18px;
+  }
+
+  .auth-icon-badge {
+    margin-bottom: 10px;
+  }
+
+  .auth-card {
+    padding: 20px;
+  }
+}
+
+/* ============================================================
+   MOBILE HEIGHT
+============================================================ */
+
+@media (max-width: 480px) and (max-height: 700px) {
+  .login-signup-page {
+    justify-content: flex-start;
+
+    padding-top: 20px;
+    padding-bottom: 20px;
+
+    overflow-y: auto;
+  }
+
+  .auth-header-block {
+    margin-bottom: 16px;
+  }
+}
+
+/* ============================================================
+   ACCESSIBILITY
+============================================================ */
+
+.auth-tab:focus-visible,
+.auth-submit:focus-visible,
+.auth-eye-toggle:focus-visible,
+.auth-forgot-link:focus-visible,
+.store-popup-close:focus-visible,
+.popup-cancel-button:focus-visible,
+.popup-create-button:focus-visible,
+.store-search-results button:focus-visible,
+.auth-input-wrap input:focus-visible,
+.auth-input-wrap select:focus-visible,
+.popup-input-wrap input:focus-visible {
+  outline: 2px solid var(--color-primary);
+
+  outline-offset: 2px;
+}
+
+/* ============================================================
+   REDUCED MOTION
+============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-tab,
+  .auth-input-wrap input,
+  .auth-input-wrap select,
+  .auth-submit,
+  .popup-input-wrap input,
+  .popup-cancel-button,
+  .popup-create-button,
+  .store-search-results button {
+    transition: none;
+  }
+}
+
