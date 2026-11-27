@@ -1,7 +1,12 @@
+
 import "reflect-metadata";
 
 import { DataSource } from "typeorm";
-import { mkdirSync } from "node:fs";
+import {
+    mkdirSync,
+    existsSync,
+    copyFileSync
+} from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import sqlite3 from "sqlite3";
@@ -28,18 +33,46 @@ import { Session } from "./entity/TransactionsSession.js";
 import { Audit } from "./entity/TransactionsAudit.js";
 import { ActionType } from "./entity/MasterActionType.js";
 
+// Existing database included in the deployment package
+const seedDatabasePath = resolve(
+    process.cwd(),
+    "shop_inventory.sqlite"
+);
+
+// Persistent database location on Azure
 const databasePath = process.env.SQLITE_DB_PATH
     ? resolve(process.env.SQLITE_DB_PATH)
-    : fileURLToPath(new URL("../shop_inventory.sqlite", import.meta.url));
+    : fileURLToPath(
+        new URL("../shop_inventory.sqlite", import.meta.url)
+    );
 
+// Create the database directory if it does not exist
 mkdirSync(dirname(databasePath), { recursive: true });
+
+// Copy the existing database only during first initialization
+if (!existsSync(databasePath)) {
+    if (!existsSync(seedDatabasePath)) {
+        throw new Error(
+            `SQLite database not found. Expected source: ${seedDatabasePath}`
+        );
+    }
+
+    copyFileSync(seedDatabasePath, databasePath);
+
+    console.log(
+        "Existing SQLite database copied to persistent storage."
+    );
+}
+
+console.log("SQLite database location:", databasePath);
 
 export const AppDataSource = new DataSource({
     type: "sqlite",
     driver: sqlite3,
     database: databasePath,
-    synchronize:true,
+    synchronize: true,
     logging: false,
+
     entities: [
         ActionType,
         DiscountType,
@@ -62,6 +95,7 @@ export const AppDataSource = new DataSource({
         Store,
         User,
     ],
+
     migrations: [],
     subscribers: []
 });
