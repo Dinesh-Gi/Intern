@@ -5,7 +5,8 @@ import { DataSource } from "typeorm";
 import {
     mkdirSync,
     existsSync,
-    copyFileSync
+    copyFileSync,
+    statSync
 } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -33,30 +34,43 @@ import { Session } from "./entity/TransactionsSession.js";
 import { Audit } from "./entity/TransactionsAudit.js";
 import { ActionType } from "./entity/MasterActionType.js";
 
-// Existing database included in the deployment package
+// Get the directory containing the compiled datasource.js file
+const currentDirectory = dirname(fileURLToPath(import.meta.url));
+
+// Original SQLite database included in the deployment package.
+// Compiled datasource.js is inside wwwroot/dist.
+// Therefore, move one level up to locate the original database.
 const seedDatabasePath = resolve(
-    process.cwd(),
-    "shop_inventory.sqlite"
+    currentDirectory,
+    "../shop_inventory.sqlite"
 );
 
-// Persistent database location on Azure
+// Persistent SQLite database location on Azure
 const databasePath = process.env.SQLITE_DB_PATH
     ? resolve(process.env.SQLITE_DB_PATH)
-    : fileURLToPath(
-        new URL("../shop_inventory.sqlite", import.meta.url)
-    );
+    : resolve(currentDirectory, "../shop_inventory.sqlite");
 
-// Create the database directory if it does not exist
+// Create the persistent database directory if it does not exist
 mkdirSync(dirname(databasePath), { recursive: true });
 
-// Copy the existing database only during first initialization
+// Initialize persistent database only if it does not already exist
 if (!existsSync(databasePath)) {
+
+    // Verify original database exists
     if (!existsSync(seedDatabasePath)) {
         throw new Error(
             `SQLite database not found. Expected source: ${seedDatabasePath}`
         );
     }
 
+    // Verify original database is not empty
+    const seedStats = statSync(seedDatabasePath);
+
+    if (seedStats.size === 0) {
+        throw new Error("Original SQLite database is empty.");
+    }
+
+    // Copy original database to persistent storage
     copyFileSync(seedDatabasePath, databasePath);
 
     console.log(
@@ -64,7 +78,9 @@ if (!existsSync(databasePath)) {
     );
 }
 
-console.log("SQLite database location:", databasePath);
+// Log database paths for troubleshooting
+console.log("SQLite source database:", seedDatabasePath);
+console.log("Active SQLite database:", databasePath);
 
 export const AppDataSource = new DataSource({
     type: "sqlite",
