@@ -124,6 +124,17 @@ jobs:
           Copy-Item 'backend/package.json' $deployDir
           Copy-Item 'backend/package-lock.json' $deployDir
 
+          # Copy existing SQLite database
+          $databaseFile = 'backend/shop_inventory.sqlite'
+
+          if (!(Test-Path $databaseFile)) {
+            throw "SQLite database file not found: $databaseFile"
+          }
+
+          Copy-Item $databaseFile $deployDir -Force
+
+          Write-Host 'SQLite database copied successfully.'
+
           # Create Windows IISNode configuration
           @'
           <?xml version="1.0" encoding="utf-8"?>
@@ -154,6 +165,18 @@ jobs:
 
           if (!(Test-Path (Join-Path $deployDir 'node_modules/sqlite3'))) {
             throw 'SQLite production dependency missing'
+          }
+
+          if (!(Test-Path (Join-Path $deployDir 'shop_inventory.sqlite'))) {
+            throw 'SQLite database missing from deployment package'
+          }
+
+          # Display database size
+          $dbInfo = Get-Item (Join-Path $deployDir 'shop_inventory.sqlite')
+          Write-Host "SQLite database size: $($dbInfo.Length) bytes"
+
+          if ($dbInfo.Length -eq 0) {
+            throw 'SQLite database file is empty'
           }
 
           # Create ZIP with files at package root
